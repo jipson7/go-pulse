@@ -10,6 +10,7 @@ import (
 
 const TrialCollection = "trials"
 const DeviceCollection = "devices"
+const DataCollection = "data"
 
 func getFirestoreClient(ctx context.Context) *firestore.Client {
 	conf := &firebase.Config{ProjectID: "pulseoximeterapp"}
@@ -47,5 +48,6 @@ func main() {
 	iter := client.Collection(TrialCollection).Documents(ctx)
 	trials := createTrialsSlice(iter)
 	trials.LoadDevices(ctx)
-	trials.Print()
+	testDevice := (trials[0]).devices[0]
+	testDevice.GetData(ctx)
 }

@@ -3,6 +3,9 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"fmt"
+	"golang.org/x/net/context"
+	"google.golang.org/api/iterator"
+	"log"
 )
 
 type Device struct {
@@ -22,4 +25,18 @@ func NewDevice(doc *firestore.DocumentSnapshot) *Device {
 
 func (device *Device) Print() {
 	fmt.Println(device.description)
+}
+
+func (device *Device) GetData(ctx context.Context) {
+	iter := device.ref.Collection(DataCollection).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(doc.Ref.ID)
+	}
 }
