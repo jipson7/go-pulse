@@ -3,6 +3,7 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"firebase.google.com/go"
+	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
@@ -25,8 +26,8 @@ func getFirestoreClient(ctx context.Context) *firestore.Client {
 	return client
 }
 
-func createTrialsSlice(iter *firestore.DocumentIterator) []*Trial {
-	var trials []*Trial
+func createTrialsSlice(iter *firestore.DocumentIterator) Trials {
+	var trials Trials
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -35,8 +36,7 @@ func createTrialsSlice(iter *firestore.DocumentIterator) []*Trial {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		trial := NewTrial(doc)
-		trials = append(trials, trial)
+		trials.AddTrial(doc)
 	}
 	return trials
 }
@@ -47,6 +47,7 @@ func main() {
 	defer client.Close()
 	iter := client.Collection(TrialCollection).Documents(ctx)
 	trials := createTrialsSlice(iter)
-	printTrials(trials)
-	trials.loadDevices(client)
+	fmt.Println(len(trials))
+	//printTrials(trials)
+	trials.LoadDevices(ctx)
 }

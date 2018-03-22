@@ -3,11 +3,14 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"fmt"
+	"golang.org/x/net/context"
+	"google.golang.org/api/iterator"
+	"log"
 )
 
 type Trial struct {
 	ref     *firestore.DocumentRef
-	devices []Device
+	devices []*Device
 	start   int64
 	end     int64
 	date    string
@@ -15,7 +18,11 @@ type Trial struct {
 
 type Trials []*Trial
 
-func NewTrial(doc *firestore.DocumentSnapshot) *Trial {
+func (trials *Trials) AddTrial(doc *firestore.DocumentSnapshot) {
+	*trials = append(*trials, newTrial(doc))
+}
+
+func newTrial(doc *firestore.DocumentSnapshot) *Trial {
 	t := new(Trial)
 	t.ref = doc.Ref
 	t.devices = nil
@@ -26,14 +33,16 @@ func NewTrial(doc *firestore.DocumentSnapshot) *Trial {
 	return t
 }
 
-func (trials Trials) LoadDevices(client *firestore.Client) {
+func (trials Trials) LoadDevices(ctx context.Context) {
+	fmt.Println("Loading Devices...")
 	for _, trial := range trials {
-		trial.LoadDevices(client)
+		trial.LoadDevices(ctx)
 	}
+	fmt.Println("Devices Loaded.")
 }
 
-func (trial *Trial) LoadDevices(client *firestore.Client) {
-	iter := trial.ref.Collection(DeviceCollection)
+func (trial *Trial) LoadDevices(ctx context.Context) {
+	iter := trial.ref.Collection(DeviceCollection).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -43,6 +52,6 @@ func (trial *Trial) LoadDevices(client *firestore.Client) {
 			log.Fatalln(err)
 		}
 		device := NewDevice(doc)
-		fmt.Println(device)
+		trial.devices = append(trial.devices, device)
 	}
 }
