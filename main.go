@@ -3,7 +3,6 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"firebase.google.com/go"
-	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
@@ -47,7 +46,6 @@ func main() {
 	defer client.Close()
 	iter := client.Collection(TrialCollection).Documents(ctx)
 	trials := createTrialsSlice(iter)
-	fmt.Println(len(trials))
-	//printTrials(trials)
 	trials.LoadDevices(ctx)
+	trials.Print()
 }

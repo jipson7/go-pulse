@@ -34,11 +34,9 @@ func newTrial(doc *firestore.DocumentSnapshot) *Trial {
 }
 
 func (trials Trials) LoadDevices(ctx context.Context) {
-	fmt.Println("Loading Devices...")
 	for _, trial := range trials {
 		trial.LoadDevices(ctx)
 	}
-	fmt.Println("Devices Loaded.")
 }
 
 func (trial *Trial) LoadDevices(ctx context.Context) {
@@ -53,5 +51,20 @@ func (trial *Trial) LoadDevices(ctx context.Context) {
 		}
 		device := NewDevice(doc)
 		trial.devices = append(trial.devices, device)
+	}
+}
+
+func (trial *Trial) Print() {
+	fmt.Println(trial.date)
+}
+
+func (trials Trials) Print() {
+	for _, trial := range trials {
+		fmt.Println("\nTrial:")
+		trial.Print()
+		fmt.Println("Devices:")
+		for _, device := range trial.devices {
+			device.Print()
+		}
 	}
 }
