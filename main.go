@@ -5,6 +5,7 @@ import (
 	"errors"
 	"firebase.google.com/go"
 	"fmt"
+	"github.com/wcharczuk/go-chart"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
@@ -67,12 +68,53 @@ func promptForTrial(trials Trials) *Trial {
 	return trials[result]
 }
 
+func convertSliceIntToFloat(l []int64) (r []float64) {
+	for _, num := range l {
+		r = append(r, float64(num))
+	}
+	return
+}
+
+func createChartSeries(x, y []int64) chart.ContinuousSeries {
+	xFloat := convertSliceIntToFloat(x)
+	yFloat := convertSliceIntToFloat(y)
+	return chart.ContinuousSeries{
+		Style: chart.Style{
+			Show:        true,
+			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
+		},
+		XValues: xFloat,
+		YValues: yFloat,
+	}
+}
+
 func graphTrial(trial *Trial) {
 	trial.FetchAllData()
 	for _, device := range trial.devices {
 		x, y := device.GetDataset("hr")
-		fmt.Printf("timestamp count %d", len(x))
-		fmt.Printf("value count %d", len(y))
+		graph := chart.Chart{
+			XAxis: chart.XAxis{
+				Style: chart.Style{
+					Show: true, //enables / displays the x-axis
+				},
+			},
+			YAxis: chart.YAxis{
+				Style: chart.Style{
+					Show: true, //enables / displays the y-axis
+				},
+			},
+			Series: []chart.Series{
+				createChartSeries(x, y),
+			},
+		}
+		collector := &chart.ImageWriter{}
+		graph.Render(chart.PNG, collector)
+
+		image, err := collector.Image()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Final Image: %dx%d\n", image.Bounds().Size().X, image.Bounds().Size().Y)
 	}
 }
 

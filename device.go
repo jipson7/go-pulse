@@ -3,7 +3,6 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"errors"
-	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
