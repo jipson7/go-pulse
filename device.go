@@ -72,7 +72,8 @@ func (device *Device) FetchData() {
 	}
 }
 
-func (device *Device) GetDataset(s string) (x []int64, y []int64) {
+func (device *Device) GetDataset(s string) *Dataset {
+	var x, y []int64
 	var data map[int64]int64
 	switch s {
 	case "hr":
@@ -90,5 +91,5 @@ func (device *Device) GetDataset(s string) (x []int64, y []int64) {
 		x = append(x, timestamp)
 		y = append(y, val)
 	}
-	return
+	return NewDataset(x, y)
 }

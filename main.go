@@ -71,30 +71,21 @@ func promptForTrial(trials Trials) *Trial {
 	return trials[result]
 }
 
-func convertSliceIntToFloat(l []int64) (r []float64) {
-	for _, num := range l {
-		r = append(r, float64(num))
-	}
-	return
-}
-
-func createChartSeries(x, y []int64) chart.ContinuousSeries {
-	xFloat := convertSliceIntToFloat(x)
-	yFloat := convertSliceIntToFloat(y)
+func createChartSeries(dataset *Dataset) chart.ContinuousSeries {
 	return chart.ContinuousSeries{
 		Style: chart.Style{
 			Show:        true,
 			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
 		},
-		XValues: xFloat,
-		YValues: yFloat,
+		XValues: dataset.x,
+		YValues: dataset.y,
 	}
 }
 
 func createGraphImage(trial *Trial) (img image.Image) {
 	trial.FetchAllData()
 	for _, device := range trial.devices {
-		x, y := device.GetDataset("hr")
+		dataset := device.GetDataset("hr")
 		graph := chart.Chart{
 			XAxis: chart.XAxis{
 				Style: chart.Style{
@@ -107,7 +98,7 @@ func createGraphImage(trial *Trial) (img image.Image) {
 				},
 			},
 			Series: []chart.Series{
-				createChartSeries(x, y),
+				createChartSeries(dataset),
 			},
 		}
 		collector := &chart.ImageWriter{}
