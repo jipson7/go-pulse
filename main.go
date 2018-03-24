@@ -29,10 +29,8 @@ func getFirestoreClient() *firestore.Client {
 	return client
 }
 
-func createTrialsSlice() Trials {
+func createTrialsSlice(client *firestore.Client) Trials {
 	ctx := context.Background()
-	client := getFirestoreClient()
-	defer client.Close()
 	iter := client.Collection(TrialCollection).Documents(ctx)
 	var trials Trials
 	for {
@@ -69,8 +67,14 @@ func promptForTrial(trials Trials) *Trial {
 	return trials[result]
 }
 
+func graphTrial(trial *Trial) {
+	trial.GetAllData()
+}
+
 func main() {
-	trials := createTrialsSlice()
+	client := getFirestoreClient()
+	defer client.Close()
+	trials := createTrialsSlice(client)
 	trial := promptForTrial(trials)
-	fmt.Println(trial)
+	graphTrial(trial)
 }

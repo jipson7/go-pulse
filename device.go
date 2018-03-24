@@ -31,7 +31,16 @@ func (device *Device) String() string {
 	return device.description
 }
 
-func (device *Device) GetData(ctx context.Context) {
+func (device *Device) initMaps() {
+	device.data.hr = make(map[string]int64)
+	device.data.oxygen = make(map[string]int64)
+	device.data.red_led = make(map[string]int64)
+	device.data.ir_led = make(map[string]int64)
+}
+
+func (device *Device) GetData() {
+	ctx := context.Background()
+	device.initMaps()
 	iter := device.ref.Collection(DataCollection).Documents(ctx)
 	for {
 		doc, err := iter.Next()
