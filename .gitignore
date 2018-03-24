@@ -59,3 +59,6 @@ tags
 
 #Binary
 pulse_oximeter
+
+#output
+graphs/

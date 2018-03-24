@@ -8,7 +8,10 @@ import (
 	"github.com/wcharczuk/go-chart"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
+	"image"
+	"image/png"
 	"log"
+	"os"
 )
 
 const TrialCollection = "trials"
@@ -88,7 +91,7 @@ func createChartSeries(x, y []int64) chart.ContinuousSeries {
 	}
 }
 
-func graphTrial(trial *Trial) {
+func createGraphImage(trial *Trial) (img image.Image) {
 	trial.FetchAllData()
 	for _, device := range trial.devices {
 		x, y := device.GetDataset("hr")
@@ -110,12 +113,22 @@ func graphTrial(trial *Trial) {
 		collector := &chart.ImageWriter{}
 		graph.Render(chart.PNG, collector)
 
-		image, err := collector.Image()
+		var err error
+		img, err = collector.Image()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
-		fmt.Printf("Final Image: %dx%d\n", image.Bounds().Size().X, image.Bounds().Size().Y)
 	}
+	return
+}
+
+func saveImage(img image.Image, filename string) {
+	outfile, err := os.Create(filename)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer outfile.Close()
+	png.Encode(outfile, img)
 }
 
 func main() {
@@ -123,5 +136,6 @@ func main() {
 	defer client.Close()
 	trials := createTrialsSlice(client)
 	trial := promptForTrial(trials)
-	graphTrial(trial)
+	img := createGraphImage(trial)
+	saveImage(img, "./graphs/test.png")
 }
