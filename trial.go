@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"cloud.google.com/go/firestore"
-	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
@@ -54,17 +54,12 @@ func (trial *Trial) LoadDevices(ctx context.Context) {
 	}
 }
 
-func (trial *Trial) Print() {
-	fmt.Println(trial.date)
-}
-
-func (trials Trials) Print() {
-	for _, trial := range trials {
-		fmt.Println("\nTrial:")
-		trial.Print()
-		fmt.Println("Devices:")
-		for _, device := range trial.devices {
-			device.Print()
-		}
+func (trial *Trial) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString(trial.date + "\n")
+	buffer.WriteString("Device(s):\n")
+	for _, device := range trial.devices {
+		buffer.WriteString(device.String() + "\n")
 	}
+	return buffer.String()
 }

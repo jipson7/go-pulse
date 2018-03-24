@@ -2,7 +2,9 @@ package main
 
 import (
 	"cloud.google.com/go/firestore"
+	"errors"
 	"firebase.google.com/go"
+	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
@@ -41,6 +43,26 @@ func createTrialsSlice(iter *firestore.DocumentIterator) Trials {
 	return trials
 }
 
+func promptForTrial(trials Trials) *Trial {
+	fmt.Println("Select one of the following Trials:\n")
+	for idx, trial := range trials {
+		fmt.Printf("Press (%d) for the following Trial:\n", idx)
+		fmt.Println(trial)
+	}
+
+	fmt.Printf("Enter a number: ")
+	var result int
+	_, err := fmt.Scanf("%d", &result)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if len(trials) <= result {
+		err := errors.New("Selected Trial out of range")
+		log.Fatalln(err)
+	}
+	return trials[result]
+}
+
 func main() {
 	ctx := context.Background()
 	client := getFirestoreClient(ctx)
@@ -48,6 +70,6 @@ func main() {
 	iter := client.Collection(TrialCollection).Documents(ctx)
 	trials := createTrialsSlice(iter)
 	trials.LoadDevices(ctx)
-	testDevice := (trials[0]).devices[0]
-	testDevice.GetData(ctx)
+	trial := promptForTrial(trials)
+	fmt.Println(trial)
 }
