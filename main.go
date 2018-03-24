@@ -18,18 +18,20 @@ const TrialCollection = "trials"
 const DeviceCollection = "devices"
 const DataCollection = "data"
 
+func catch(err error) {
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 func getFirestoreClient() *firestore.Client {
 	ctx := context.Background()
 	conf := &firebase.Config{ProjectID: "pulseoximeterapp"}
 	app, err := firebase.NewApp(ctx, conf)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	catch(err)
 
 	client, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	catch(err)
 	return client
 }
 
@@ -42,9 +44,7 @@ func createTrialsSlice(client *firestore.Client) Trials {
 		if err == iterator.Done {
 			break
 		}
-		if err != nil {
-			log.Fatalln(err)
-		}
+		catch(err)
 		trials.AddTrial(doc)
 	}
 	trials.LoadDevices()
@@ -61,9 +61,7 @@ func promptForTrial(trials Trials) *Trial {
 	fmt.Printf("Enter a number: ")
 	var result int
 	_, err := fmt.Scanf("%d", &result)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	catch(err)
 	if len(trials) <= result {
 		err := errors.New("Selected Trial out of range")
 		log.Fatalln(err)
@@ -106,18 +104,14 @@ func createGraphImage(trial *Trial) (img image.Image) {
 
 		var err error
 		img, err = collector.Image()
-		if err != nil {
-			log.Fatalln(err)
-		}
+		catch(err)
 	}
 	return
 }
 
 func saveImage(img image.Image, filename string) {
 	outfile, err := os.Create(filename)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	catch(err)
 	defer outfile.Close()
 	png.Encode(outfile, img)
 }

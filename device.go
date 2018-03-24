@@ -49,14 +49,10 @@ func (device *Device) FetchData() {
 		if err == iterator.Done {
 			break
 		}
-		if err != nil {
-			log.Fatalln(err)
-		}
+		catch(err)
 		docData := doc.Data()
 		timestamp, err := strconv.ParseInt(doc.Ref.ID, 10, 64)
-		if err != nil {
-			log.Fatalln(err)
-		}
+		catch(err)
 		if hr, ok := docData["hr"]; ok {
 			device.data.hr[timestamp] = hr.(int64)
 		}

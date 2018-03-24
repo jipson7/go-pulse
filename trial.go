@@ -5,7 +5,6 @@ import (
 	"cloud.google.com/go/firestore"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
-	"log"
 )
 
 type Trial struct {
@@ -47,9 +46,7 @@ func (trial *Trial) LoadDevices(ctx context.Context) {
 		if err == iterator.Done {
 			break
 		}
-		if err != nil {
-			log.Fatalln(err)
-		}
+		catch(err)
 		device := NewDevice(doc)
 		trial.devices = append(trial.devices, device)
 	}
