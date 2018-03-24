@@ -33,7 +33,8 @@ func newTrial(doc *firestore.DocumentSnapshot) *Trial {
 	return t
 }
 
-func (trials Trials) LoadDevices(ctx context.Context) {
+func (trials Trials) LoadDevices() {
+	ctx := context.Background()
 	for _, trial := range trials {
 		trial.LoadDevices(ctx)
 	}

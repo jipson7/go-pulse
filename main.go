@@ -14,7 +14,8 @@ const TrialCollection = "trials"
 const DeviceCollection = "devices"
 const DataCollection = "data"
 
-func getFirestoreClient(ctx context.Context) *firestore.Client {
+func getFirestoreClient() *firestore.Client {
+	ctx := context.Background()
 	conf := &firebase.Config{ProjectID: "pulseoximeterapp"}
 	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
@@ -28,7 +29,11 @@ func getFirestoreClient(ctx context.Context) *firestore.Client {
 	return client
 }
 
-func createTrialsSlice(iter *firestore.DocumentIterator) Trials {
+func createTrialsSlice() Trials {
+	ctx := context.Background()
+	client := getFirestoreClient()
+	defer client.Close()
+	iter := client.Collection(TrialCollection).Documents(ctx)
 	var trials Trials
 	for {
 		doc, err := iter.Next()
@@ -40,6 +45,7 @@ func createTrialsSlice(iter *firestore.DocumentIterator) Trials {
 		}
 		trials.AddTrial(doc)
 	}
+	trials.LoadDevices()
 	return trials
 }
 
@@ -64,12 +70,7 @@ func promptForTrial(trials Trials) *Trial {
 }
 
 func main() {
-	ctx := context.Background()
-	client := getFirestoreClient(ctx)
-	defer client.Close()
-	iter := client.Collection(TrialCollection).Documents(ctx)
-	trials := createTrialsSlice(iter)
-	trials.LoadDevices(ctx)
+	trials := createTrialsSlice()
 	trial := promptForTrial(trials)
 	fmt.Println(trial)
 }
