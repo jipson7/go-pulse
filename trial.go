@@ -65,8 +65,8 @@ func (trial *Trial) String() string {
 	return buffer.String()
 }
 
-func (trial *Trial) GetAllData() {
+func (trial *Trial) FetchAllData() {
 	for _, device := range trial.devices {
-		device.GetData()
+		device.FetchData()
 	}
 }

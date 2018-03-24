@@ -68,7 +68,12 @@ func promptForTrial(trials Trials) *Trial {
 }
 
 func graphTrial(trial *Trial) {
-	trial.GetAllData()
+	trial.FetchAllData()
+	for _, device := range trial.devices {
+		x, y := device.GetDataset("hr")
+		fmt.Printf("timestamp count %d", len(x))
+		fmt.Printf("value count %d", len(y))
+	}
 }
 
 func main() {

@@ -2,9 +2,12 @@ package main
 
 import (
 	"cloud.google.com/go/firestore"
+	"errors"
+	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"log"
+	"strconv"
 )
 
 type Device struct {
@@ -15,7 +18,7 @@ type Device struct {
 }
 
 type DeviceData struct {
-	hr, oxygen, red_led, ir_led map[string]int64
+	hr, oxygen, red_led, ir_led map[int64]int64
 }
 
 func NewDevice(doc *firestore.DocumentSnapshot) *Device {
@@ -32,13 +35,13 @@ func (device *Device) String() string {
 }
 
 func (device *Device) initMaps() {
-	device.data.hr = make(map[string]int64)
-	device.data.oxygen = make(map[string]int64)
-	device.data.red_led = make(map[string]int64)
-	device.data.ir_led = make(map[string]int64)
+	device.data.hr = make(map[int64]int64)
+	device.data.oxygen = make(map[int64]int64)
+	device.data.red_led = make(map[int64]int64)
+	device.data.ir_led = make(map[int64]int64)
 }
 
-func (device *Device) GetData() {
+func (device *Device) FetchData() {
 	ctx := context.Background()
 	device.initMaps()
 	iter := device.ref.Collection(DataCollection).Documents(ctx)
@@ -51,7 +54,10 @@ func (device *Device) GetData() {
 			log.Fatalln(err)
 		}
 		docData := doc.Data()
-		timestamp := doc.Ref.ID
+		timestamp, err := strconv.ParseInt(doc.Ref.ID, 10, 64)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		if hr, ok := docData["hr"]; ok {
 			device.data.hr[timestamp] = hr.(int64)
 		}
@@ -65,4 +71,25 @@ func (device *Device) GetData() {
 			device.data.ir_led[timestamp] = ir_led.(int64)
 		}
 	}
+}
+
+func (device *Device) GetDataset(s string) (x []int64, y []int64) {
+	var data map[int64]int64
+	switch s {
+	case "hr":
+		data = device.data.hr
+	case "oxygen":
+		data = device.data.oxygen
+	case "red_led":
+		data = device.data.red_led
+	case "ir_led":
+		data = device.data.ir_led
+	default:
+		log.Fatalln(errors.New("Invalid Data Selection " + s))
+	}
+	for timestamp, val := range data {
+		x = append(x, timestamp)
+		y = append(y, val)
+	}
+	return
 }
