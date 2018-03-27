@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/wcharczuk/go-chart"
 	"sort"
 )
 
@@ -15,6 +16,19 @@ func NewDataset(x []int64, y []int64) *Dataset {
 	d.y = convertSliceIntToFloat(y)
 	sort.Sort(d)
 	return d
+}
+
+// Create chart.Series compatible with
+// wcharczuk/go-chart
+func (d *Dataset) CreateChartSeries() chart.ContinuousSeries {
+	return chart.ContinuousSeries{
+		Style: chart.Style{
+			Show:        true,
+			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
+		},
+		XValues: d.x,
+		YValues: d.y,
+	}
 }
 
 // Drops the first n elements from the dataset

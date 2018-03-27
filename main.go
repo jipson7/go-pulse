@@ -69,19 +69,7 @@ func promptForTrial(trials Trials) *Trial {
 	return trials[result]
 }
 
-func createChartSeries(dataset *Dataset) chart.ContinuousSeries {
-	return chart.ContinuousSeries{
-		Style: chart.Style{
-			Show:        true,
-			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
-		},
-		XValues: dataset.x,
-		YValues: dataset.y,
-	}
-}
-
 func createGraphImage(trial *Trial) (img image.Image) {
-	trial.FetchAllData()
 	for _, device := range trial.devices {
 		dataset := device.GetDataset("hr")
 		dataset.DropFirst(1)
@@ -97,7 +85,7 @@ func createGraphImage(trial *Trial) (img image.Image) {
 				},
 			},
 			Series: []chart.Series{
-				createChartSeries(dataset),
+				dataset.CreateChartSeries(),
 			},
 		}
 		collector := &chart.ImageWriter{}
@@ -122,6 +110,7 @@ func main() {
 	defer client.Close()
 	trials := createTrialsSlice(client)
 	trial := promptForTrial(trials)
+	trial.FetchAllData()
 	img := createGraphImage(trial)
 	saveImage(img, "./graphs/test.png")
 }
