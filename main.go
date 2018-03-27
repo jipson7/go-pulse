@@ -84,6 +84,7 @@ func createGraphImage(trial *Trial) (img image.Image) {
 	trial.FetchAllData()
 	for _, device := range trial.devices {
 		dataset := device.GetDataset("hr")
+		dataset.DropFirst(1)
 		graph := chart.Chart{
 			XAxis: chart.XAxis{
 				Style: chart.Style{

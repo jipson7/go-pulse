@@ -17,6 +17,15 @@ func NewDataset(x []int64, y []int64) *Dataset {
 	return d
 }
 
+// Drops the first n elements from the dataset
+func (d *Dataset) DropFirst(n int) {
+	if n > d.Len() {
+		n = d.Len()
+	}
+	d.x = d.x[n:]
+	d.y = d.y[n:]
+}
+
 func convertSliceIntToFloat(l []int64) (r []float64) {
 	for _, num := range l {
 		r = append(r, float64(num))
