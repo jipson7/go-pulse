@@ -68,7 +68,7 @@ func (device *Device) FetchData() {
 	}
 }
 
-func (device *Device) GetDataset(s string) *Dataset {
+func (device *Device) GetDataset(s string) (*Dataset, bool) {
 	var x, y []int64
 	var data map[int64]int64
 	switch s {
@@ -83,9 +83,13 @@ func (device *Device) GetDataset(s string) *Dataset {
 	default:
 		log.Fatalln(errors.New("Invalid Data Selection " + s))
 	}
-	for timestamp, val := range data {
-		x = append(x, timestamp)
-		y = append(y, val)
+	if len(data) == 0 {
+		return nil, false
+	} else {
+		for timestamp, val := range data {
+			x = append(x, timestamp)
+			y = append(y, val)
+		}
 	}
-	return NewDataset(x, y)
+	return NewDataset(x, y), true
 }

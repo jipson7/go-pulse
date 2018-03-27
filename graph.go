@@ -8,16 +8,17 @@ import (
 )
 
 type Graph struct {
-	trial     *Trial
-	dataTypes []string
+	trial *Trial
 }
 
 func (g Graph) createSeriesSlice() (seriesSlice []chart.Series) {
 	for _, device := range g.trial.devices {
-		for _, dataType := range g.dataTypes {
-			dataset := device.GetDataset(dataType)
-			chartSeries := dataset.CreateChartSeries()
-			seriesSlice = append(seriesSlice, chartSeries)
+		for _, dataType := range DataTypes {
+			dataset, exists := device.GetDataset(dataType)
+			if exists {
+				chartSeries := dataset.CreateChartSeries()
+				seriesSlice = append(seriesSlice, chartSeries)
+			}
 		}
 	}
 	return

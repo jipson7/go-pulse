@@ -14,6 +14,8 @@ const TrialCollection = "trials"
 const DeviceCollection = "devices"
 const DataCollection = "data"
 
+var DataTypes = [...]string{"hr", "oxygen", "red_led", "ir_led"}
+
 func catch(err error) {
 	if err != nil {
 		log.Fatalln(err)
@@ -71,7 +73,6 @@ func main() {
 	trials := createTrialsSlice(client)
 	trial := promptForTrial(trials)
 	trial.FetchAllData()
-	dataTypes := []string{"hr"}
-	graph := Graph{trial, dataTypes}
+	graph := Graph{trial}
 	graph.SaveImageToFile("./graphs/test.png")
 }

@@ -67,3 +67,9 @@ func (trial *Trial) FetchAllData() {
 		device.FetchData()
 	}
 }
+
+func (trial *Trial) AnalyzeData() {
+	//if len(trial.devices) > 1 {
+	//	analysis.similari
+	//}
+}
