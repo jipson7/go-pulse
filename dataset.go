@@ -21,6 +21,7 @@ func NewDataset(x []int64, y []int64) *Dataset {
 // Create chart.Series compatible with
 // wcharczuk/go-chart
 func (d *Dataset) CreateChartSeries() chart.ContinuousSeries {
+	d.DropFirst(1)
 	return chart.ContinuousSeries{
 		Style: chart.Style{
 			Show:        true,
