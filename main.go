@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"errors"
 	"firebase.google.com/go"
+	"flag"
 	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
@@ -68,13 +69,20 @@ func promptForTrial(trials Trials) *Trial {
 }
 
 func main() {
+	//Define flags for args
+	var graphFlag = flag.Bool("graph", true, "Create Graphs")
+	flag.Parse()
+
+	//Setup Client
 	client := getFirestoreClient()
 	defer client.Close()
 	trials := createTrialsSlice(client)
 	trial := promptForTrial(trials)
 	trial.FetchAllData()
-	graph := Graph{trial}
-	graph.SaveImageToFile("./graphs/test.png")
+	if *graphFlag {
+		graph := Graph{trial}
+		graph.SaveImageToFile("./graphs/test.png")
+	}
 	analysis := Analyze(trial)
 	fmt.Println(analysis)
 }
