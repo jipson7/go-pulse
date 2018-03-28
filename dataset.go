@@ -50,19 +50,25 @@ func (d1 *Dataset) GetCommonBounds(d2 *Dataset) (start int64, end int64) {
 		err := errors.New("No common bounds between datasets")
 		catch(err)
 	}
-	start := d1Start
+	start = d1Start
 	if d2Start > start {
 		start = d2Start
 	}
-	end := d1End
+	end = d1End
 	if d2End < end {
 		end = d2End
 	}
 	return
 }
 
+// Interpolate by choosing the closest point to the right
 func (d *Dataset) Interpolate(x int64) (y float64) {
-	y = 0.0
+	for idx, val := range d.x {
+		if val >= x {
+			y = float64(d.y[idx])
+			break
+		}
+	}
 	return
 }
 
