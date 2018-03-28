@@ -75,6 +75,6 @@ func main() {
 	trial.FetchAllData()
 	graph := Graph{trial}
 	graph.SaveImageToFile("./graphs/test.png")
-	analysis := NewAnalysis(trial)
+	analysis := Analyze(trial)
 	fmt.Println(analysis)
 }
